@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <View
+            android:id="@+id/maskTop"
+            android:layout_width="match_parent"
+            android:layout_height="172dp"
+            android:background="@color/viewfinder_mask"/>
+
+        <ImageView
+            android:id="@+id/scanBox"
+            android:layout_width="252dp"
+            android:layout_height="252dp"
+            android:layout_below="@id/maskTop"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp"
+            android:background="@drawable/img_scan_box"/>
+
+        <ImageView
+            android:id="@+id/scanLine"
+            android:layout_width="232dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/maskTop"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/icon_scan_line"/>
+
+        <View
+            android:id="@+id/masLeft"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/maskTop"
+            android:layout_marginRight="-10dp"
+            android:layout_toLeftOf="@id/scanBox"
+            android:background="@color/viewfinder_mask"/>
+
+        <View
+            android:id="@+id/masRight"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/maskTop"
+            android:layout_marginLeft="-10dp"
+            android:layout_toRightOf="@id/scanBox"
+            android:background="@color/viewfinder_mask"/>
+
+        <View
+            android:id="@+id/masBottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/scanBox"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="-10dp"
+            android:layout_toLeftOf="@id/masRight"
+            android:layout_toRightOf="@id/masLeft"
+            android:background="@color/viewfinder_mask"/>
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scanBox"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:text="将二维码/条码放入框内即可自动扫描或前往相册扫描"
+            android:textColor="@color/zdd_font_c"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/toPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scanBox"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="65dp"
+            android:padding="15dp"
+            android:text="前往相册"
+            android:textColor="@color/zdd_font_c"
+            android:textSize="14sp"/>
+
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/showDecodeIV"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>
