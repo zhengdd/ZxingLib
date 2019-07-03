@@ -22,10 +22,6 @@ public class MainActivity extends CaptureActivity {
     private ImageView showDecodeIV;
     private TextView toPhoto;
 
-    @Override
-    public void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
-    }
 
     @Override
     protected int getLayoutViewId() {
