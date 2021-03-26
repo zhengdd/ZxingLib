@@ -17,8 +17,10 @@
 package com.dongdong.zxingscan;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.provider.Browser;
 
@@ -42,10 +44,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
@@ -112,26 +118,21 @@ public final class CaptureActivityHandler extends Handler {
             activity.handleDecode((Result) message.obj, barcode, scaleFactor);
 
         } else if (message.what == R.id.decode_gallery) {
+            //相册图片获取成功，进行图片解析
             state = State.SUCCESS;
             Uri QRImgUri = (Uri) message.obj;
             Bitmap bit = null;
-            try {
-                bit = BitmapFactory.decodeStream(activity.getContentResolver()
-                        .openInputStream
-                                (QRImgUri));
-                Result result = decodeQRCode(bit);
 
-                if (result != null) {
-                    activity.handleDecode(result, bit, 1.0f);
-                } else {
-                    restartPreviewAndDecode();
-                    showToats("未检测到二维码");
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            bit = doBitByUri(QRImgUri);
+            Result result = decodeQRCode(bit);
+
+            if (result != null) {
+                activity.handleDecode(result, bit, 1.0f);
+            } else {
                 restartPreviewAndDecode();
                 showToats("未检测到二维码");
             }
+
 
         } else if (message.what == R.id.decode_failed) {// We're decoding as fast as possible, so when one decode fails, start another.
             state = State.PREVIEW;
@@ -201,6 +202,71 @@ public final class CaptureActivityHandler extends Handler {
         }
     }
 
+    private Bitmap doBitByUri(Uri qrUri) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inDither = true;//optional
+        options.inPreferredConfig = Bitmap.Config.RGB_565;//optional
+        InputStream input = null;
+        Bitmap bitmap = null;
+        try {
+            input = activity.getContentResolver().openInputStream(qrUri);
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(input, null, options);
+            input.close();
+            options.inSampleSize = calculateInSampleSize(options);
+            options.inJustDecodeBounds = false;
+            input = activity.getContentResolver().openInputStream(qrUri);
+            bitmap = BitmapFactory.decodeStream(input, null, options);
+            input.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+
+    /**
+     * 设置压缩比值
+     *
+     * @param options
+     * @return
+     */
+    private int caculateSampleSize(BitmapFactory.Options options) {
+        int sampleSize = 1;
+        int picWidth = options.outWidth;
+        int picHeight = options.outHeight;
+
+        while (((picWidth * picHeight) / sampleSize) / 1024 > 3072) {
+            sampleSize *= 2;
+        }
+        return sampleSize;
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options) {
+        // Raw height and width of image
+        final int reqHeight = 1024;
+        final int reqWidth = 1024;
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
     /**
      * 解析图片
      *
@@ -208,6 +274,9 @@ public final class CaptureActivityHandler extends Handler {
      * @return
      */
     public Result decodeQRCode(Bitmap srcBitmap) {
+        if (srcBitmap == null) {
+            return null;
+        }
         // 解码的参数
         Hashtable<DecodeHintType, Object> hints = new Hashtable<>(2);
         // 可以解析的编码类型
@@ -239,7 +308,6 @@ public final class CaptureActivityHandler extends Handler {
     private void showToats(String msg) {
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
     }
-
 
 
 }

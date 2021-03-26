@@ -42,6 +42,7 @@ public final class CameraManager {
 
     private static final String TAG = CameraManager.class.getSimpleName();
 
+    private static final int ZOOM_ERROR = -1;
     private static final int MIN_FRAME_WIDTH = 240;
     private static final int MIN_FRAME_HEIGHT = 240;
     private static final int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
@@ -187,6 +188,52 @@ public final class CameraManager {
             }
         }
     }
+
+    /**
+     * @return the maximum zoom value supported by the camera.
+     */
+    public synchronized int getMaxZoom() {
+        OpenCamera theCamera = camera;
+        if (theCamera != null) {
+            Camera.Parameters parameters = theCamera.getCamera().getParameters();
+            return parameters.getMaxZoom();
+        }
+        return ZOOM_ERROR;
+    }
+
+    /**
+     * @return he current zoom value. The range is 0 to {@link
+     * #getMaxZoom}. 0 means the camera is not zoomed.
+     */
+    public synchronized int getZoom() {
+        OpenCamera theCamera = camera;
+        if (theCamera != null) {
+            Camera.Parameters parameters = theCamera.getCamera().getParameters();
+            return parameters.getZoom();
+        }
+        return ZOOM_ERROR;
+    }
+
+    /**
+     * value zoom value. The valid range is 0 to {@link #getMaxZoom}.
+     *
+     * @param zoom
+     */
+    public synchronized void setZoom(int zoom) {
+        if (zoom < 0) {
+            return;
+        }
+        if (zoom > getMaxZoom()) {
+            return;
+        }
+        OpenCamera theCamera = camera;
+        if (theCamera != null) {
+            Camera.Parameters parameters = theCamera.getCamera().getParameters();
+            parameters.setZoom(zoom);
+            theCamera.getCamera().setParameters(parameters);
+        }
+    }
+
 
     /**
      * A single preview frame will be returned to the handler supplied. The data will arrive as byte[]

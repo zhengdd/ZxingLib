@@ -24,8 +24,6 @@ import com.dongdong.zxingscan.camera.CameraManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -35,14 +33,12 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,6 +66,8 @@ public abstract class CaptureActivity extends Activity implements SurfaceHolder.
     private BeepManager beepManager;
     private AmbientLightManager ambientLightManager;
     private Rect scanRect;
+    private int MaxZoom = -1;
+    private int thisZoom = -1;
 
 
     public Handler getHandler() {
@@ -195,6 +193,31 @@ public abstract class CaptureActivity extends Activity implements SurfaceHolder.
         return super.onKeyDown(keyCode, event);
     }
 
+    public void setZoom(int zoom) {
+        cameraManager.setZoom(zoom);
+    }
+
+    public int getThisZoom() {
+        return thisZoom;
+    }
+
+    public void setThisZoom(int thisZoom) {
+        this.thisZoom = thisZoom;
+    }
+
+    public int getMaxZoom() {
+        if (cameraManager != null) {
+            return cameraManager.getMaxZoom();
+        }
+        return MaxZoom;
+    }
+
+    public int getZoom() {
+        if (cameraManager != null) {
+            return cameraManager.getZoom();
+        }
+        return thisZoom;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -224,6 +247,11 @@ public abstract class CaptureActivity extends Activity implements SurfaceHolder.
         }
     }
 
+    /**
+     * 解析相册图片
+     *
+     * @param imgUrl
+     */
     private void decodeBitmapUri(Uri imgUrl) {
         // Bitmap isn't used yet -- will be used soon
         if (handler == null) {
@@ -311,6 +339,9 @@ public abstract class CaptureActivity extends Activity implements SurfaceHolder.
             }
             decodeOrStoreSavedBitmap(null, savedResultToShow);
             decodeBitmapUri(DeImgUri);
+
+            MaxZoom = cameraManager.getMaxZoom();
+            thisZoom = cameraManager.getZoom();
         } catch (IOException ioe) {
             Log.w(TAG, ioe);
             displayFrameworkBugMessageAndExit();
@@ -346,6 +377,9 @@ public abstract class CaptureActivity extends Activity implements SurfaceHolder.
     }
 
 
+    /**
+     * 打开相册，虚先申请权限
+     */
     public void openGallery() {
         Intent intentToPickPic = new Intent(Intent.ACTION_PICK, null);
         // 如果限制上传到服务器的图片类型时可以直接写如："image/jpeg 、 image/png等的类型" 所有类型则写 "image/*"

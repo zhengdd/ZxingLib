@@ -3,8 +3,6 @@ package com.dongdong.app;
 
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -13,6 +11,7 @@ import android.widget.TextView;
 
 import com.dongdong.zxingscan.CaptureActivity;
 import com.dongdong.zxingscan.DecodeFormatManager;
+import com.dongdong.zxingscan.ZoomListenerView;
 import com.google.zxing.Result;
 
 public class MainActivity extends CaptureActivity {
@@ -21,6 +20,7 @@ public class MainActivity extends CaptureActivity {
     private ObjectAnimator scanLineAnim;
     private ImageView showDecodeIV;
     private TextView toPhoto;
+    private ZoomListenerView zoomView;
 
 
     @Override
@@ -33,10 +33,26 @@ public class MainActivity extends CaptureActivity {
         scanLine = getId(R.id.scanLine);
         showDecodeIV = getId(R.id.showDecodeIV);
         toPhoto = getId(R.id.toPhoto);
+        zoomView = getId(R.id.setZoomView);
     }
 
     @Override
     protected void doInitDate() {
+        zoomView.setScaleListener(new ZoomListenerView.ScaleListener() {
+            @Override
+            public void onScaleFactor(float factor) {
+                if (factor > 1) {
+                    int v = (int) (getMaxZoom() * 0.02);
+                    setThisZoom(
+                     (getThisZoom() + v) > getMaxZoom() ? getMaxZoom() : getThisZoom() + v);
+                    setZoom(getThisZoom());
+                } else {
+                    int v = (int) (getMaxZoom() * 0.02);
+                    setThisZoom( (getThisZoom() - v) < 0 ? 0 : getThisZoom() - v);
+                    setZoom(getThisZoom());
+                }
+            }
+        });
         startLineAnim();
         showDecodeIV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +103,7 @@ public class MainActivity extends CaptureActivity {
             showDecodeIV.setImageBitmap(barcode);
             showDecodeIV.setVisibility(View.VISIBLE);
         }
+
     }
 
     @Override

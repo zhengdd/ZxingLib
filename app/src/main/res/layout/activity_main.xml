@@ -12,9 +12,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:orientation="vertical">
 
         <View
             android:id="@+id/maskTop"
@@ -80,20 +80,25 @@
             android:textColor="@color/zdd_font_c"
             android:textSize="14sp"/>
 
-        <TextView
-            android:id="@+id/toPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/scanBox"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="65dp"
-            android:padding="15dp"
-            android:text="前往相册"
-            android:textColor="@color/zdd_font_c"
-            android:textSize="14sp"/>
-
 
     </RelativeLayout>
+
+    <com.dongdong.zxingscan.ZoomListenerView
+        android:id="@+id/setZoomView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id="@+id/toPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="35dp"
+        android:padding="15dp"
+        android:text="前往相册"
+        android:textColor="@color/zdd_font_c"
+        android:textSize="14sp"/>
 
     <ImageView
         android:id="@+id/showDecodeIV"
